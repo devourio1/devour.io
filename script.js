@@ -1,37 +1,42 @@
+// Aguarda o HTML ser totalmente carregado para executar o script
 document.addEventListener('DOMContentLoaded', () => {
-    const daySelector = document.getElementById('daySelector');
+
+    // --- CONFIGURAÇÃO MANUAL ---
+    // Adicione manualmente o caminho para cada arquivo de batalha aqui.
+    // A ordem que você adicionar não importa, o script vai organizar por data.
+    const battleFiles = [
+        "data/2025-10-06.json",
+        "data/2025-10-07.json",
+        "data/2025-10-05.json" 
+        // Ex: "data/AAAA-MM-DD.json"
+    ];
+    // -------------------------
+
+    const battleSelector = document.getElementById('battleSelector');
     const searchInput = document.getElementById('searchInput');
     const tableBody = document.getElementById('resultsTableBody');
 
-    // IMPORTANTE: Liste aqui os nomes dos seus arquivos JSON
-    // Conforme você gera novos resultados, adicione o nome do arquivo a esta lista.
-    const resultFiles = [
-        "resultados_20251007_163000.json",
-        "resultados_20251006_110000.json" // Exemplo de um arquivo mais antigo
-        // "outro_arquivo.json",
-    ];
+    let currentBattleData = [];
 
-    let currentData = []; // Armazena os dados da batalha selecionada
-
-    // Função para carregar e exibir os dados de um arquivo JSON
-    async function loadResults(fileName) {
+    async function loadBattle(filePath) {
         try {
-            const response = await fetch(fileName);
-            if (!response.ok) {
-                throw new Error('Não foi possível carregar o arquivo de resultados.');
-            }
+            const response = await fetch(filePath);
+            if (!response.ok) throw new Error(`Erro ao carregar: ${response.statusText}`);
             const data = await response.json();
-            currentData = data;
-            displayResults(data);
+            currentBattleData = data;
+            renderTable(data);
         } catch (error) {
-            console.error(error);
-            tableBody.innerHTML = `<tr><td colspan="4">Erro ao carregar dados. Verifique se o arquivo '${fileName}' existe.</td></tr>`;
+            console.error(`Falha ao carregar dados de '${filePath}':`, error);
+            tableBody.innerHTML = `<tr><td colspan="4">Erro ao carregar dados. Verifique se o arquivo '${filePath}' existe.</td></tr>`;
         }
     }
 
-    // Função para preencher a tabela com os dados
-    function displayResults(data) {
-        tableBody.innerHTML = ''; // Limpa a tabela antes de preencher
+    function renderTable(data) {
+        tableBody.innerHTML = '';
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="4">Nenhum resultado encontrado.</td></tr>`;
+            return;
+        }
         data.forEach(player => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -44,34 +49,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Função para filtrar a tabela com base na pesquisa
-    function filterResults() {
+    function filterTable() {
         const searchTerm = searchInput.value.toLowerCase();
-        const filteredData = currentData.filter(player => 
+        const filteredData = currentBattleData.filter(player =>
             player.name.toLowerCase().includes(searchTerm)
         );
-        displayResults(filteredData);
+        renderTable(filteredData);
     }
-    
-    // Preenche o seletor de dias e carrega o primeiro resultado
-    function initialize() {
-        resultFiles.forEach(file => {
+
+    function init() {
+        if (!battleFiles || battleFiles.length === 0) {
+            console.warn("Nenhuma batalha configurada na lista 'battleFiles'.");
+            return;
+        }
+
+        // NOVO: Organiza os arquivos pela data (do mais novo para o mais antigo)
+        // Isso funciona porque o formato AAAA-MM-DD pode ser comparado como texto.
+        battleFiles.sort((a, b) => b.localeCompare(a));
+
+        // Preenche o menu <select> com a lista já organizada
+        battleFiles.forEach(filePath => {
             const option = document.createElement('option');
-            option.value = file;
-            // Formata o nome do arquivo para algo mais legível
-            option.textContent = `Batalha: ${file.replace('resultados_', '').replace('.json', '')}`;
-            daySelector.appendChild(option);
+            option.value = filePath;
+            const friendlyName = filePath.replace('data/', '').replace('.json', '');
+            option.textContent = `Batalha de ${friendlyName}`;
+            battleSelector.appendChild(option);
         });
 
-        // Adiciona os "escutadores de eventos"
-        daySelector.addEventListener('change', (e) => loadResults(e.target.value));
-        searchInput.addEventListener('input', filterResults);
+        battleSelector.addEventListener('change', () => loadBattle(battleSelector.value));
+        searchInput.addEventListener('input', filterTable);
 
-        // Carrega os resultados do primeiro arquivo da lista ao iniciar
-        if (resultFiles.length > 0) {
-            loadResults(resultFiles[0]);
-        }
+        // Carrega a primeira batalha da lista (que agora é a mais recente)
+        loadBattle(battleFiles[0]);
     }
 
-    initialize();
+    init();
 });

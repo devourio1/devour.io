@@ -1,29 +1,36 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados - Jogo das Bolinhas</title>
+    <title>Ball Battle Results</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Histórico de Batalhas</h1>
-        <p>Veja os resultados das simulações do Jogo das Bolinhas.</p>
+        <header>
+            <h1>Battle History</h1>
+            <p>Select a battle and search for participants.</p>
+        </header>
 
         <div class="controls">
-            <select id="daySelector"></select>
-            
-            <input type="text" id="searchInput" placeholder="Pesquisar por nome...">
+            <div class="control-group">
+                <label for="battleSelector">Select Battle:</label>
+                <select id="battleSelector"></select>
+            </div>
+            <div class="control-group">
+                <label for="searchInput">Search by Name:</label>
+                <input type="text" id="searchInput" placeholder="Enter player name...">
+            </div>
         </div>
 
         <table class="results-table">
             <thead>
                 <tr>
                     <th>Rank</th>
-                    <th>Jogador</th>
+                    <th>Player</th>
                     <th>Kills</th>
-                    <th>Eliminado por</th>
+                    <th>Eliminated by</th>
                 </tr>
             </thead>
             <tbody id="resultsTableBody">

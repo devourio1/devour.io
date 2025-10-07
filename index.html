@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados - Jogo das Bolinhas</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Histórico de Batalhas</h1>
+        <p>Veja os resultados das simulações do Jogo das Bolinhas.</p>
+
+        <div class="controls">
+            <select id="daySelector"></select>
+            
+            <input type="text" id="searchInput" placeholder="Pesquisar por nome...">
+        </div>
+
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Jogador</th>
+                    <th>Kills</th>
+                    <th>Eliminado por</th>
+                </tr>
+            </thead>
+            <tbody id="resultsTableBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
